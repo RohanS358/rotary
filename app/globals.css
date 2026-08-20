@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&display=swap');
 @font-face {
   font-family: 'Figtree';
   src: url('/Figtree-VariableFont_wght.ttf') format('truetype');
@@ -50,6 +51,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --font-sans: 'Figtree', system-ui, sans-serif;
   --font-mono: 'Figtree', monospace;
+  --font-signature: 'Caveat', 'Segoe Script', cursive;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -106,3 +108,7 @@ body {
 html {
   scroll-behavior: smooth;
 }
+
+/* Horizontal card rails: scroll, no visible bar. */
+.scrollbar-none { scrollbar-width: none; -ms-overflow-style: none; }
+.scrollbar-none::-webkit-scrollbar { display: none; }

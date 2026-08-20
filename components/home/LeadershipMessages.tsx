@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Quote } from "lucide-react";
+import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Message = {
@@ -96,10 +96,17 @@ const initials = (name: string) =>
     .map((w) => w[0])
     .join("");
 
+/** First paragraph, trimmed at a word boundary — enough to pull the reader in. */
+const excerpt = (m: Message, max = 260) => {
+  const t = m.paragraphs[0];
+  if (t.length <= max) return t;
+  return t.slice(0, t.lastIndexOf(" ", max)).replace(/[,;:]$/, "") + "…";
+};
+
 function Portrait({ m, size }: { m: Message; size: number }) {
   return (
     <div
-      className="relative shrink-0 rounded-xl overflow-hidden ring-2 ring-[#f7a800]/70 bg-[#17458f]/10"
+      className="relative shrink-0 rounded-full overflow-hidden ring-2 ring-white/70 shadow-sm bg-[#17458f]/10"
       style={{ width: size, height: size }}
     >
       {m.photo ? (
@@ -120,116 +127,122 @@ function Portrait({ m, size }: { m: Message; size: number }) {
 }
 
 export default function LeadershipMessages() {
-  const [active, setActive] = useState(0);
-  const m = MESSAGES[active];
+  const [open, setOpen] = useState<number | null>(null);
+  const m = open === null ? null : MESSAGES[open];
 
   return (
-    <section className="relative overflow-hidden bg-[#f7f8fb] py-16 lg:py-24">
-      {/* Dot grid texture */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.05]"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle at 1px 1px, rgba(23,69,143,0.6) 1px, transparent 0)",
-          backgroundSize: "40px 40px",
-        }}
-      />
-
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
+    <section className="relative bg-[#f5f5f4] py-16 lg:py-24 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* ── Heading ── */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="mb-10 lg:mb-14 text-center"
         >
-          <span className="text-xs font-bold tracking-[0.28em] uppercase text-[#f7a800]">
-            Rotary Year 2026&ndash;27
+          <span className="text-xs font-medium tracking-[0.22em] uppercase text-[#0f2252]/50">
+            Messages
           </span>
           <h2
-            className="mt-2 text-[#0f2252] font-extrabold tracking-tight leading-tight"
-            style={{ fontSize: "clamp(2rem, 3.4vw, 3.4rem)" }}
+            className="mt-3 text-[#0f2252] font-semibold tracking-tight leading-[1.12]"
+            style={{ fontSize: "clamp(2rem, 3.6vw, 3.5rem)" }}
           >
-            Messages from <span style={{ color: "#f7a800" }}>Leadership</span>
+            Words from those who lead us.
+            <br />
+            Rotary Year <span style={{ color: "#f7a800" }}>2026&ndash;27</span>.
           </h2>
         </motion.div>
+      </div>
 
-        <div className="grid lg:grid-cols-[minmax(0,20rem)_1fr] gap-6 lg:gap-10 items-start">
-          {/* ── Selector ── */}
-          <div className="flex lg:flex-col gap-3 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 -mx-6 px-6 lg:mx-0 lg:px-0">
-            {MESSAGES.map((item, i) => (
-              <button
-                key={item.name}
-                onClick={() => setActive(i)}
-                aria-pressed={i === active}
+      {/* ── Card rail ── */}
+      <div className="mt-10 lg:mt-14 overflow-x-auto scrollbar-none">
+        <div className="flex gap-6 px-6 lg:px-8 pb-4 w-max mx-auto max-w-none">
+          {MESSAGES.map((item, i) => (
+            <motion.button
+              key={item.name}
+              onClick={() => setOpen(i)}
+              initial={{ opacity: 0, y: 28 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.5, delay: i * 0.08, ease: "easeOut" }}
+              className="group relative text-left w-[19rem] sm:w-[21rem] shrink-0 rounded-2xl bg-white p-7 flex flex-col shadow-[0_10px_40px_rgba(15,34,82,0.07)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_50px_rgba(15,34,82,0.12)]"
+            >
+              <Portrait m={item} size={52} />
+
+              <p
                 className={cn(
-                  "group flex items-center gap-3 text-left rounded-2xl p-3 pr-4 shrink-0 lg:w-full transition-all duration-300 border",
-                  i === active
-                    ? "bg-white border-[#f7a800]/40 shadow-[0_8px_30px_rgba(23,69,143,0.10)]"
-                    : "bg-white/50 border-transparent hover:bg-white hover:border-[#17458f]/10"
+                  "mt-6 text-[#0f2252]/85 text-[15px]",
+                  item.nepali ? "leading-[1.9]" : "leading-relaxed"
                 )}
               >
-                <Portrait m={item} size={48} />
-                <div className="min-w-0">
-                  <p
-                    className={cn(
-                      "text-sm font-bold leading-tight truncate transition-colors",
-                      i === active ? "text-[#0f2252]" : "text-[#0f2252]/75"
-                    )}
-                  >
-                    {item.name}
-                  </p>
-                  <p className="text-xs text-[#0f2252]/55 leading-tight mt-0.5 truncate">
-                    {item.role}
-                  </p>
-                </div>
-              </button>
-            ))}
-          </div>
+                &ldquo;{excerpt(item)}&rdquo;
+              </p>
 
-          {/* ── Letter ── */}
-          <div className="relative rounded-3xl bg-white border border-[#17458f]/10 shadow-[0_18px_60px_rgba(23,69,143,0.08)] overflow-hidden">
-            {/* Gold top rule */}
+              <div className="mt-auto pt-10">
+                <span className="block text-2xl text-[#0f2252] font-signature leading-none">
+                  {item.name}
+                </span>
+                <span className="mt-2 block text-sm text-[#0f2252]/45">
+                  {item.role}
+                  {item.org !== item.role && <> at {item.org}</>}
+                </span>
+              </div>
+
+              <span className="absolute top-7 right-7 text-xs font-medium text-[#0f2252]/0 group-hover:text-[#f7a800] transition-colors duration-300">
+                Read
+              </span>
+            </motion.button>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Full letter ── */}
+      <AnimatePresence>
+        {m && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
             <div
-              className="h-1.5"
-              style={{ background: "linear-gradient(90deg, #f7a800 0%, #17458f 100%)" }}
+              className="absolute inset-0 bg-[#0f2252]/45 backdrop-blur-sm"
+              onClick={() => setOpen(null)}
             />
-
-            <AnimatePresence mode="wait">
-              <motion.article
-                key={active}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.35, ease: "easeOut" }}
-                className="p-7 sm:p-10 lg:p-12"
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-label={`Message from ${m.name}`}
+              initial={{ y: 40, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 20, opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="relative w-full max-w-3xl max-h-[88vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-white shadow-2xl"
+            >
+              <button
+                onClick={() => setOpen(null)}
+                aria-label="Close"
+                className="sticky top-4 float-right mr-4 z-10 w-9 h-9 rounded-full bg-[#0f2252]/5 hover:bg-[#0f2252]/10 flex items-center justify-center text-[#0f2252] transition-colors"
               >
-                {/* Author header */}
-                <header className="flex items-center gap-4 pb-6 mb-6 border-b border-[#17458f]/10">
-                  <Portrait m={m} size={72} />
+                <X className="w-4 h-4" />
+              </button>
+
+              <div className="p-7 sm:p-10 lg:p-12">
+                <header className="flex items-center gap-4 pb-6 mb-6 border-b border-[#0f2252]/10">
+                  <Portrait m={m} size={64} />
                   <div className="min-w-0">
-                    <h3 className="text-lg lg:text-xl font-bold text-[#0f2252] leading-tight">
-                      {m.name}
-                    </h3>
-                    <p className="text-sm font-semibold text-[#f7a800] leading-tight mt-0.5">
-                      {m.role}
-                    </p>
-                    <p className="text-xs text-[#0f2252]/55 mt-0.5">
-                      {m.org} &middot; {m.year}
+                    <h3 className="text-lg font-semibold text-[#0f2252] leading-tight">{m.name}</h3>
+                    <p className="text-sm text-[#0f2252]/50 leading-tight mt-1">
+                      {m.role} &middot; {m.org} &middot; {m.year}
                     </p>
                   </div>
-                  <Quote
-                    className="hidden sm:block ml-auto w-12 h-12 text-[#f7a800]/20 shrink-0"
-                    strokeWidth={1.5}
-                  />
                 </header>
 
                 {m.title && (
-                  <p className="text-base lg:text-lg font-bold text-[#0f2252] mb-5">{m.title}</p>
+                  <p className="text-base lg:text-lg font-semibold text-[#0f2252] mb-5">{m.title}</p>
                 )}
 
-                <p className="text-[#0f2252] font-semibold mb-4">{m.salutation}</p>
+                <p className="text-[#0f2252] font-medium mb-4">{m.salutation}</p>
 
                 <div
                   className={cn(
@@ -242,18 +255,20 @@ export default function LeadershipMessages() {
                   ))}
                 </div>
 
-                <footer className="mt-8 pt-6 border-t border-[#17458f]/10">
-                  <p className="text-[#0f2252]/70 text-sm">{m.signOff}</p>
-                  <p className="mt-2 font-bold text-[#0f2252]">{m.name}</p>
-                  <p className="text-sm text-[#0f2252]/60">
+                <footer className="mt-8 pt-6 border-t border-[#0f2252]/10">
+                  <p className="text-[#0f2252]/60 text-sm">{m.signOff}</p>
+                  <p className="mt-1 text-3xl text-[#0f2252] font-signature leading-none">
+                    {m.name}
+                  </p>
+                  <p className="mt-2 text-sm text-[#0f2252]/50">
                     {m.role}, {m.org}
                   </p>
                 </footer>
-              </motion.article>
-            </AnimatePresence>
-          </div>
-        </div>
-      </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
