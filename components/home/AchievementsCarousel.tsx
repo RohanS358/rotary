@@ -81,7 +81,7 @@ export default function AchievementsCarousel() {
           transition={{ duration: 0.6 }}
           className="text-[#f7a800] text-[10px] font-semibold tracking-[0.3em] uppercase mb-4"
         >
-          Recognition & Honors
+          Our Impact
         </motion.p>
         <motion.h2
           initial={{ opacity: 0, y: 16 }}
@@ -91,7 +91,7 @@ export default function AchievementsCarousel() {
           className="text-[#0f2252] font-extrabold tracking-tight leading-tight"
           style={{ fontSize: "clamp(2rem, 4vw, 3.2rem)" }}
         >
-          Our Achievements
+          By the Numbers
         </motion.h2>
         <motion.p
           initial={{ opacity: 0 }}
@@ -100,7 +100,7 @@ export default function AchievementsCarousel() {
           transition={{ delay: 0.2, duration: 0.6 }}
           className="text-[#17458f]/50 text-sm mt-3 max-w-md mx-auto"
         >
-          Decades of service recognized by Rotary International and District 3292
+          Twenty-eight years of service in Kathmandu, counted in projects and people
         </motion.p>
       </div>
 

@@ -112,11 +112,13 @@ export const PROJECT_CATEGORIES = ['All', 'Maternal and Child Health', 'Basic Ed
 export const GALLERY_CATEGORIES = ['All', 'Education', 'Health', 'Empowerment', 'Environment', 'General'] as const
 export const ARCHIVE_TYPES = ['All', 'meeting', 'event', 'document'] as const
 
+// Real figures: 16 board + 47 members in the members table; 20 active projects;
+// chartered 01 April 1998; beneficiaries summed from each project's impact metric.
 export const STATS = [
-  { label: 'Active Members', value: 50, suffix: '+' },
-  { label: 'Projects Completed', value: 100, suffix: '+' },
-  { label: 'Years of Service', value: 25, suffix: '+' },
-  { label: 'Lives Impacted', value: 10000, suffix: '+' },
+  { label: 'Active Members', value: 63, suffix: '' },
+  { label: 'Projects Completed', value: 20, suffix: '' },
+  { label: 'Years of Service', value: 28, suffix: '' },
+  { label: 'Lives Impacted', value: 3142, suffix: '+' },
 ] as const
 
 export const SAMPLE_TESTIMONIALS = [
@@ -153,51 +155,53 @@ export const SITE_CONTENT_DEFAULTS: Record<string, string> = {
   hero_cta_secondary: 'About Us',
   about_mission: "The mission of Rotary International is to provide services to others, promote integrity, and advance world understanding, goodwill, and peace through the fellowship of business, professional, and community leaders.",
   about_description: "Rotary is a global network of 1.2 million neighbors, friends, leaders, and problem-solvers who see a world where people unite and take action to create lasting change — across the globe, in our communities, and in ourselves. For more than 110 years we have been committed to sustainable projects that address literacy, peace, water, health, and many other issues facing our world.",
-  stats_members: '50+',
-  stats_projects: '100+',
-  stats_years: '25+',
-  stats_lives: '10,000+',
+  stats_members: '63',
+  stats_projects: '20',
+  stats_years: '28',
+  stats_lives: '3,142+',
 }
 
+// Real club milestones, not awards. Figures from the members/projects tables and
+// the district site's club record (chartered 01 April 1998, club id 51038).
 export const ACHIEVEMENTS = [
   {
     id: 1,
-    title: 'Best Club Award',
-    year: '2023–24',
-    org: 'District 3292',
-    description: 'Awarded for outstanding community service and exemplary member engagement in Rotary Year 2023–24, recognized across all clubs in District 3292.',
+    title: '20 Service Projects',
+    year: '2025\u201326',
+    org: 'Across 8 Areas of Focus',
+    description: 'Twenty community service projects delivered in a single Rotary year, spanning disease prevention, maternal and child health, water and sanitation, education and the environment.',
     icon: 'trophy',
   },
   {
     id: 2,
-    title: 'Paul Harris Fellow',
-    year: '2022–23',
-    org: 'TRF Recognition',
-    description: 'Multiple members recognized as Paul Harris Fellows for significant cumulative contributions to The Rotary Foundation, funding humanitarian projects worldwide.',
+    title: 'NPR 22,05,371 Contributed',
+    year: '2025\u201326',
+    org: 'Club Service Fund',
+    description: 'Raised and spent on community service by club members and donors \u2014 from the NPR 500,000 Humla health camp to the KJ Baral Rotary Food Bank.',
     icon: 'award',
   },
   {
     id: 3,
-    title: 'Presidential Citation',
-    year: '2021–22',
-    org: 'RI President',
-    description: 'Received the prestigious RI Presidential Citation for achieving goals in membership growth, impactful service projects, and strong leadership development programs.',
+    title: '28 Years of Service',
+    year: 'Since 1998',
+    org: 'Chartered 01 April 1998',
+    description: 'Chartered under Charter President Rtn. Ganesh Bahadur Thapa and serving the Kathmandu community without interruption ever since.',
     icon: 'star',
   },
   {
     id: 4,
-    title: 'Club Excellence Award',
-    year: '2020–21',
-    org: 'District 3292',
-    description: 'Recognized for exemplary performance in club administration, effective project implementation, and maintaining high standards of Rotary fellowship.',
+    title: '3,142 Lives Touched',
+    year: 'Recorded to date',
+    org: 'Verified Beneficiaries',
+    description: 'Counted from the recorded beneficiaries of each completed project \u2014 patients screened, students supported, families fed and households given clean water.',
     icon: 'medal',
   },
   {
     id: 5,
-    title: 'Environmental Service Award',
-    year: '2019–20',
-    org: 'District 3292',
-    description: 'Honored for the Rotary Prahari Batika project — over 10,000 trees planted across Kathmandu Valley, significantly contributing to urban green cover and environmental awareness.',
+    title: '63 Rotarians, 35 Rotaractors',
+    year: '2026\u201327',
+    org: 'Club Membership',
+    description: 'A club of 63 Rotarians supported by 35 Rotaractors across the Rotaract Club of Pashupati Kathmandu and the Rotaract Club of Pashupati Nepal Law Campus.',
     icon: 'leaf',
   },
 ] as const

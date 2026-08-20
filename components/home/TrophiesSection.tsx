@@ -5,52 +5,53 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-// ── Replace image paths with your actual backgroundless trophy PNGs ──────────
+// Real club projects, straight from the district site record.
+const IMG = "https://pashupati-kathmandu.rotarydistrict3292.org.np/storage/project_images";
 const TROPHIES = [
   {
     id: 0,
-    image: "/trophies/trophy-1.png",
-    title: "District Governor's Award",
-    year: "2023–24",
-    category: "District Recognition",
+    image: `${IMG}/HGQ89ER4PSKC4lrWvVnQJMBVkRPOMOKF7dRKTDSG.jpg`,
+    title: "Mission Humla for Health & Education",
+    year: "2025\u201326",
+    category: "Disease Prevention & Treatment",
     description:
-      "Awarded by the District 3292 Governor for outstanding community service, membership growth, and overall club excellence throughout the Rotary year.",
+      "A free comprehensive health camp in Namkha Rural Municipality, Humla \u2014 200+ patients served, 170 blood pressure checks, 100+ ultrasound screenings, plus warm clothing for the students of Shree Motiram Primary School. Budget: NPR 500,000.",
   },
   {
     id: 1,
-    image: "/trophies/trophy-2.png",
-    title: "Best Club in Service",
-    year: "2022–23",
-    category: "Service Excellence",
+    image: `${IMG}/XYD6Hgkx1D5lRobWqNPJdjJNj6lj2Ps056NVeMou.jpg`,
+    title: "Safe Drinking Water",
+    year: "2025\u201326",
+    category: "Water & Sanitation",
     description:
-      "Recognised for the highest number of community service projects completed in a single Rotary year, including the Prahari Batika tree-planting drive.",
+      "A 250 L/hour water filter with four output taps, inaugurated by District Governor Rtn. Binod Koirala \u2014 clean drinking water for roughly 1,000 people.",
   },
   {
     id: 2,
-    image: "/trophies/trophy-3.png",
-    title: "Vocational Service Award",
-    year: "2021–22",
-    category: "Vocational",
+    image: `${IMG}/6kN1ZKFSn5ciCatAMT9Qm5vQ4hC4ZH2k9kwP9ogJ.jpg`,
+    title: "Winter Clothes Distribution",
+    year: "2025\u201326",
+    category: "Basic Education & Literacy",
     description:
-      "Presented for exemplary vocational training initiatives supporting youth employment and skills development across Kathmandu Valley.",
+      "100 sets of warm jackets and track suits for children at Shree Adharbhut Madhyamik Vidyalaya, Dhankuta and Hermichour Madhyamik Vidyalaya, Gulmi. Budget: NPR 100,000.",
   },
   {
     id: 3,
-    image: "/trophies/trophy-4.png",
-    title: "International Service Citation",
-    year: "2020–21",
-    category: "International",
+    image: `${IMG}/P0PwPMUtIyAgoueLhHBX4mr5OqOUfAGwIEzy892u.jpg`,
+    title: "World Breastfeeding Week",
+    year: "2025\u201326",
+    category: "Maternal & Child Health",
     description:
-      "Honoured by Rotary International for cross-border collaboration and humanitarian projects in partnership with clubs across South Asia.",
+      "An awareness and training session with HPN Clinic for 30 breastfeeding mothers, facilitated by Rtn. Dr. Binod Dangal and Rtn. Dr. Archana KC, with both Rotaract clubs taking part.",
   },
   {
     id: 4,
-    image: "/trophies/trophy-5.png",
-    title: "Paul Harris Fellowship",
-    year: "2019–20",
-    category: "Foundation",
+    image: `${IMG}/6IBcfGnhUYeZbnTPqQGV1TPuoojwxPF6dUMc7X1M.jpg`,
+    title: "Let's Unite to Save the Environment",
+    year: "2025\u201326",
+    category: "Environment",
     description:
-      "The club collectively achieved Paul Harris Fellow recognition through sustained contributions to The Rotary Foundation's humanitarian programmes.",
+      "A tree plantation drive at Kageshwari Manohara\u20136 with Ward Office No. 6 and both Rotaract clubs, reaching around 200 people.",
   },
 ];
 
@@ -86,18 +87,18 @@ const TrophyImage = ({ active, direction }: { active: number; direction: number 
         exit="exit"
         className="relative z-10"
       >
-        <Image
-          src={TROPHIES[active].image}
-          alt={TROPHIES[active].title}
-          width={1587}
-          height={2245}
-          sizes="(max-width: 1024px) 60vw, 208px"
-          className="w-full h-auto object-contain mx-auto"
-          onError={(e) => { (e.target as HTMLImageElement).style.visibility = "hidden"; }}
-          style={{
-            filter: "drop-shadow(0 8px 32px rgba(247,168,0,0.32)) drop-shadow(0 2px 10px rgba(0,0,0,0.55))",
-          }}
-        />
+        <div
+          className="relative w-full aspect-[3/4] overflow-hidden rounded-2xl ring-1 ring-white/15"
+          style={{ boxShadow: "0 8px 32px rgba(247,168,0,0.22), 0 2px 10px rgba(0,0,0,0.55)" }}
+        >
+          <Image
+            src={TROPHIES[active].image}
+            alt={TROPHIES[active].title}
+            fill
+            sizes="(max-width: 1024px) 60vw, 208px"
+            className="object-cover"
+          />
+        </div>
       </motion.div>
     </AnimatePresence>
   </div>
@@ -154,13 +155,13 @@ export default function TrophiesSection() {
       {/* ── Heading ─────────────────────────────────────────────────── */}
       <div className="text-center mb-10 lg:mb-14 relative z-10 px-4">
         <span className="text-[#f7a800] text-[11px] font-bold tracking-[0.32em] uppercase">
-          Recognition &amp; Honours
+          Service in Action
         </span>
         <h2
           className="text-white font-extrabold tracking-tight leading-tight mt-2"
           style={{ fontSize: "clamp(1.8rem, 3.5vw, 3rem)" }}
         >
-          Awards &amp; Trophies
+          Our Signature Projects
         </h2>
       </div>
 

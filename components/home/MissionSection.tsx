@@ -8,27 +8,28 @@ import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 
-// ── Replace these with actual club event photos ───────────────────────────
+// Real club projects — images and captions from the district site record.
+const IMG = "https://pashupati-kathmandu.rotarydistrict3292.org.np/storage/project_images";
 const SLIDES = [
   {
-    image: "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=1200&h=900&fit=crop",
-    event: "Maternal Health Camp",
-    caption: "Free health checkups for mothers and children across Kathmandu Valley",
+    image: `${IMG}/HGQ89ER4PSKC4lrWvVnQJMBVkRPOMOKF7dRKTDSG.jpg`,
+    event: "Mission Humla for Health & Education",
+    caption: "Free health camp in Namkha Rural Municipality, Humla — 200+ patients served",
   },
   {
-    image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1200&h=900&fit=crop",
-    event: "Prahari Batika",
-    caption: "10,000 trees planted across Kathmandu — environmental service in action",
+    image: `${IMG}/XYD6Hgkx1D5lRobWqNPJdjJNj6lj2Ps056NVeMou.jpg`,
+    event: "Safe Drinking Water",
+    caption: "A 250 L/hour filter handed over with the District Governor — clean water for 1,000",
   },
   {
-    image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1200&h=900&fit=crop",
-    event: "Rotaract Fellowship",
-    caption: "Empowering young leaders through fellowship and community service",
+    image: `${IMG}/6kN1ZKFSn5ciCatAMT9Qm5vQ4hC4ZH2k9kwP9ogJ.jpg`,
+    event: "Winter Clothes Distribution",
+    caption: "100 sets of warm clothes for schoolchildren in Dhankuta and Gulmi",
   },
   {
-    image: "https://images.unsplash.com/photo-1509099836639-18ba1795216d?w=1200&h=900&fit=crop",
-    event: "Education Drive",
-    caption: "Distributing learning materials to under-resourced schools in Kathmandu",
+    image: `${IMG}/6IBcfGnhUYeZbnTPqQGV1TPuoojwxPF6dUMc7X1M.jpg`,
+    event: "Let's Unite to Save the Environment",
+    caption: "Tree plantation at Kageshwari Manohara-6 with both Rotaract clubs",
   },
 ];
 
