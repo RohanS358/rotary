@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
 export const maxDuration = 300;
+// The source site is hosted in Nepal on a single IPv4 host; running the crawler
+// from Mumbai instead of a US region cuts latency and connection resets.
+export const preferredRegion = "bom1";
 
 const ORIGIN = "https://pashupati-kathmandu.rotarydistrict3292.org.np";
 const CLUB = `${ORIGIN}/club/pashupati-kathmandu`;
@@ -90,14 +93,34 @@ function nameScore(a: string, b: string) {
 // catches every real spelling variant without pairing up distinct members.
 const NAME_MATCH_MIN = 0.85;
 
-async function getHtml(url: string) {
-  const res = await fetch(url, {
-    headers: { "user-agent": "rotary-pashupati-site-sync" },
-    cache: "no-store",
-  });
-  if (!res.ok) throw new Error(`${res.status} on ${url}`);
-  return res.text();
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * The district site drops connections when crawled quickly (undici surfaces
+ * that as a bare "fetch failed"), so back off and retry before giving up.
+ */
+async function get(url: string, tries = 4) {
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= tries; attempt++) {
+    try {
+      const res = await fetch(url, {
+        headers: { "user-agent": "rotary-pashupati-site-sync" },
+        cache: "no-store",
+        signal: AbortSignal.timeout(30_000),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res;
+    } catch (e) {
+      lastError = e;
+      if (attempt < tries) await sleep(400 * attempt);
+    }
+  }
+  throw new Error(
+    `${url} — ${lastError instanceof Error ? lastError.message : String(lastError)}`
+  );
 }
+
+const getHtml = async (url: string) => (await get(url)).text();
 
 type Supa = Awaited<ReturnType<typeof createClient>>;
 
@@ -110,9 +133,7 @@ async function mirrorImage(supabase: Supa, bucket: string, remote: string) {
   const fileName = `synced/${remote.split("/").pop()!.split("?")[0]}`;
   const { data: existing } = supabase.storage.from(bucket).getPublicUrl(fileName);
   try {
-    const res = await fetch(remote, { headers: { "user-agent": "rotary-pashupati-site-sync" } });
-    if (!res.ok) return remote;
-    const blob = await res.blob();
+    const blob = await (await get(remote)).blob();
     const { error } = await supabase.storage.from(bucket).upload(fileName, blob, {
       upsert: true,
       contentType: blob.type || "image/jpeg",
@@ -142,17 +163,29 @@ async function scrapeProjects(supabase: Supa) {
   const index = await getHtml(`${CLUB}/services`);
   const categoryIds = [...new Set([...index.matchAll(/\/services\/(\d+)\?/g)].map((m) => m[1]))];
 
+  const skipped: string[] = [];
   const detailUrls = new Set<string>();
   for (const id of categoryIds) {
-    const page = await getHtml(`${CLUB}/services/${id}`);
-    for (const m of page.matchAll(/\/club\/pashupati-kathmandu\/service\/(\d+)/g)) {
-      detailUrls.add(`${CLUB}/service/${m[1]}`);
+    try {
+      const page = await getHtml(`${CLUB}/services/${id}`);
+      for (const m of page.matchAll(/\/club\/pashupati-kathmandu\/service\/(\d+)/g)) {
+        detailUrls.add(`${CLUB}/service/${m[1]}`);
+      }
+    } catch (e) {
+      skipped.push(`category ${id}: ${e instanceof Error ? e.message : e}`);
     }
   }
 
   const projects = [];
   for (const url of detailUrls) {
-    const html = await getHtml(url);
+    // One unreachable page shouldn't abandon the whole sync.
+    let html: string;
+    try {
+      html = await getHtml(url);
+    } catch (e) {
+      skipped.push(`${url}: ${e instanceof Error ? e.message : e}`);
+      continue;
+    }
     const title = strip(html.match(/<h1 class="card-title[^>]*>([\s\S]*?)<\/h1>/)?.[1] ?? "");
     if (!title) continue;
 
@@ -181,7 +214,7 @@ async function scrapeProjects(supabase: Supa) {
       updated_at: new Date().toISOString(),
     });
   }
-  return projects;
+  return { projects, skipped };
 }
 
 async function scrapeMembers() {
@@ -206,10 +239,14 @@ export async function POST() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Not signed in" }, { status: 401 });
 
+  let stage = "scrape";
   try {
-    const [projects, scraped] = await Promise.all([scrapeProjects(supabase), scrapeMembers()]);
+    // Sequential on purpose — the source site is unhappy with parallel crawling.
+    const { projects, skipped } = await scrapeProjects(supabase);
+    const scraped = await scrapeMembers();
 
     // Projects: upsert on source_url so re-running updates instead of duplicating.
+    stage = "save projects";
     if (projects.length) {
       const { error } = await supabase
         .from("projects")
@@ -219,6 +256,7 @@ export async function POST() {
 
     // Members: only fill in photos for people we already have, and add anyone missing.
     // Roles, ordering and board/member split stay as curated in the admin panel.
+    stage = "save members";
     const { data: existing } = await supabase.from("members").select("id,name,photo_url");
     const roster = existing ?? [];
 
@@ -259,15 +297,18 @@ export async function POST() {
       if (error) throw new Error(`members: ${error.message}`);
     }
 
+    if (skipped.length) console.warn("Sync skipped:", skipped);
+
     return NextResponse.json({
       projects: projects.length,
       photosUpdated: photosAdded,
       membersAdded: newMembers.length,
+      skipped,
     });
   } catch (e) {
-    console.error("Sync failed:", e);
+    console.error(`Sync failed during ${stage}:`, e);
     return NextResponse.json(
-      { error: e instanceof Error ? e.message : "Sync failed" },
+      { error: `${stage}: ${e instanceof Error ? e.message : String(e)}` },
       { status: 500 }
     );
   }

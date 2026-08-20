@@ -93,10 +93,12 @@ export default function AdminProjectsPage() {
       const res = await fetch("/api/admin/sync", { method: "POST" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Sync failed");
+      const skipped = data.skipped?.length ? ` \u00b7 ${data.skipped.length} skipped` : "";
       toast.success(
-        `${data.projects} projects synced \u00b7 ${data.photosUpdated} member photos \u00b7 ${data.membersAdded} new members`,
+        `${data.projects} projects synced \u00b7 ${data.photosUpdated} member photos \u00b7 ${data.membersAdded} new members${skipped}`,
         { id: toastId }
       );
+      if (data.skipped?.length) console.warn("Sync skipped:", data.skipped);
       fetchProjects();
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "Sync failed", { id: toastId });
