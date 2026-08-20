@@ -38,12 +38,57 @@ const strip = (html: string) =>
     .replace(/\n{3,}/g, "\n\n")
     .trim();
 
-/** Drop leading honorifics so "AKS Sashi Raj Pandey" matches "Rtn. Sashi Raj Pandey". */
-function nameKey(name: string) {
-  const parts = name.trim().split(/\s+/);
-  while (parts.length > 1 && HONORIFICS.test(parts[0].toLowerCase())) parts.shift();
-  return parts.join(" ").toLowerCase().replace(/[^a-z0-9]/g, "");
+/** Name minus honorifics, as lowercase alphanumeric tokens. */
+function nameTokens(name: string) {
+  const parts = name
+    .split(/\s+/)
+    .map((p) => p.toLowerCase().replace(/[^a-z0-9]/g, ""))
+    .filter(Boolean);
+  while (parts.length > 1 && HONORIFICS.test(parts[0])) parts.shift();
+  return parts;
 }
+
+/** "AKS Sashi Raj Pandey" -> "sashirajpandey". */
+const nameKey = (name: string) => nameTokens(name).join("");
+
+function levenshtein(a: string, b: string) {
+  let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    const row = [i];
+    for (let j = 1; j <= b.length; j++) {
+      row[j] = Math.min(
+        prev[j] + 1,
+        row[j - 1] + 1,
+        prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+      );
+    }
+    prev = row;
+  }
+  return prev[b.length];
+}
+
+/**
+ * The district site spells names differently to our roster — Banskota/Bansdkota,
+ * Pokhrel/Pokherel, "Hark Saud"/"Hark Bahadur Saud". Score 0..1; 1 is exact.
+ */
+function nameScore(a: string, b: string) {
+  const ka = nameKey(a);
+  const kb = nameKey(b);
+  if (!ka || !kb || ka === kb) return ka && ka === kb ? 1 : 0;
+  if (ka[0] !== kb[0]) return 0;
+
+  const ta = new Set(nameTokens(a));
+  const tb = new Set(nameTokens(b));
+  const subset =
+    [...ta].every((t) => tb.has(t)) || [...tb].every((t) => ta.has(t));
+  if (subset) return 0.95;
+
+  return 1 - levenshtein(ka, kb) / Math.max(ka.length, kb.length);
+}
+
+// Below this, two names are different people. Tuned against the live roster:
+// catches every real spelling variant without pairing up distinct members.
+const NAME_MATCH_MIN = 0.85;
 
 async function getHtml(url: string) {
   const res = await fetch(url, {
@@ -151,7 +196,7 @@ async function scrapeMembers() {
     const key = nameKey(name);
     if (!key || seen.has(key)) continue;
     seen.add(key);
-    members.push({ key, name, photo_url: image || null });
+    members.push({ name, photo_url: image || null });
   }
   return members;
 }
@@ -175,12 +220,18 @@ export async function POST() {
     // Members: only fill in photos for people we already have, and add anyone missing.
     // Roles, ordering and board/member split stay as curated in the admin panel.
     const { data: existing } = await supabase.from("members").select("id,name,photo_url");
-    const byKey = new Map((existing ?? []).map((m) => [nameKey(m.name), m]));
+    const roster = existing ?? [];
 
     let photosAdded = 0;
     const newMembers = [];
     for (const m of scraped) {
-      const match = byKey.get(m.key);
+      let match: (typeof roster)[number] | undefined;
+      let best = 0;
+      for (const candidate of roster) {
+        const score = nameScore(m.name, candidate.name);
+        if (score > best) { best = score; match = candidate; }
+      }
+      if (best < NAME_MATCH_MIN) match = undefined;
       const sourceFile = m.photo_url?.split("/").pop()?.split("?")[0];
       const alreadyHave = !!sourceFile && !!match?.photo_url?.includes(sourceFile);
       const photo = m.photo_url && !alreadyHave
