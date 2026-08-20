@@ -88,9 +88,9 @@ export default function MissionSection() {
       />
 
       {/* ── Content ── */}
-      <div className="relative z-10 flex-1 flex flex-col py-6 lg:py-8">
-        <div className="flex-1 max-w-7xl mx-auto px-2 lg:px-3 w-full flex flex-col">
-          <div className="flex-1 grid lg:grid-cols-[5fr_7fr] gap-6 lg:gap-8 lg:items-stretch">
+      <div className="relative z-10 flex-1 flex flex-col py-6 lg:py-0">
+        <div className="flex-1 w-full flex flex-col">
+          <div className="flex-1 grid lg:grid-cols-2 gap-6 lg:gap-0 lg:items-stretch">
 
             {/* ── Left: text (unchanged) ── */}
             <motion.div
@@ -98,7 +98,7 @@ export default function MissionSection() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className="flex flex-col justify-center"
+              className="flex flex-col justify-center px-6 lg:px-12 xl:px-20 lg:max-w-[46rem] lg:ml-auto"
             >
               
               <h2
@@ -138,7 +138,7 @@ export default function MissionSection() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.8, delay: 1, ease: "easeOut" }}
-              className="relative rounded-2xl overflow-hidden min-h-[420px] lg:min-h-0 lg:h-full"
+              className="relative mx-6 lg:mx-0 rounded-2xl lg:rounded-none overflow-hidden min-h-[420px] lg:min-h-0 lg:h-full"
             >
               {/* ── Photo slides ── */}
               <AnimatePresence>
@@ -154,7 +154,7 @@ export default function MissionSection() {
                     src={SLIDES[current].image}
                     alt={SLIDES[current].event}
                     fill
-                    sizes="(max-width: 1024px) 100vw, 640px"
+                    sizes="(max-width: 1024px) 100vw, 50vw"
                     className="object-cover"
                   />
                   {/* Bottom-weighted gradient for text readability */}
