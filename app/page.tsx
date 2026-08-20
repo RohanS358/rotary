@@ -9,6 +9,7 @@ import NewsPublicationsCalendar from "@/components/home/NewsPublicationsCalendar
 import FeaturedProjects from "@/components/home/FeaturedProjects";
 import Testimonials from "@/components/home/Testimonials";
 import BoardMembersSection from "@/components/home/BoardMembersSection";
+import LeadershipMessages from "@/components/home/LeadershipMessages";
 
 export const dynamic = "force-dynamic";
 
@@ -35,6 +36,7 @@ export default async function Home() {
       <main>
         <Hero latestProject={latestProject} />
         <MissionSection />
+        <LeadershipMessages />
         <TrophiesSection />
         <FeaturedProjects />
         <NewsPublicationsCalendar />
