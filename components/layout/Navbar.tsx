@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ChevronRight, Heart, Users, Award, Users2, Star, Zap } from "lucide-react";
+import { Menu, X, ChevronRight, Heart, Users, Award, Users2, Star, Zap, LogIn } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NAV_ITEMS } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
@@ -150,7 +150,17 @@ export default function Navbar() {
             </div>
 
             {/* Desktop CTA */}
-            <div className="hidden xl:flex items-center">
+            <div className="hidden xl:flex items-center gap-2">
+              <Button
+                asChild
+                variant="ghost"
+                className="gap-1.5 text-[#17458f] hover:text-[#0f2252] hover:bg-[#d8e8f8] text-[14px] font-semibold h-9 px-3"
+              >
+                <Link href="/admin/login">
+                  <LogIn className="w-4 h-4" />
+                  Login
+                </Link>
+              </Button>
               <Button
                 asChild
                 className="gap-2 shadow-sm bg-[#f7a800] hover:bg-[#e09700] text-[#0f2252] border-0 text-[15px] font-semibold h-9 px-4"
@@ -407,6 +417,16 @@ export default function Navbar() {
                   <Link href="/donate">
                     <Heart className="w-4 h-4" />
                     Donate Now
+                  </Link>
+                </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  className="w-full gap-2 mt-2 border-[#c4d6ee] text-[#17458f] hover:bg-[#d8e8f8]"
+                >
+                  <Link href="/admin/login">
+                    <LogIn className="w-4 h-4" />
+                    Member Login
                   </Link>
                 </Button>
               </div>
