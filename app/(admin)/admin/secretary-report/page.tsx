@@ -9,10 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TreasuryOverview from "@/components/admin/treasury/TreasuryOverview";
 import TreasuryLedger from "@/components/admin/treasury/TreasuryLedger";
-import TreasuryReceivables from "@/components/admin/treasury/TreasuryReceivables";
+import TreasuryPeople from "@/components/admin/treasury/TreasuryPeople";
 import TreasuryFunds from "@/components/admin/treasury/TreasuryFunds";
 import { categoryLabel, outstandingOf, PAYMENT_METHOD_LABELS } from "@/lib/treasury";
-import type { Member, TreasuryEntry, TreasuryFund } from "@/lib/types";
+import type { Member, Project, TreasuryEntry, TreasuryFund } from "@/lib/types";
 
 /** July–June Rotary year containing today, e.g. "2025/26". */
 function currentRy(d = new Date()) {
@@ -52,21 +52,24 @@ export default function SecretaryReportPage() {
   const [entries, setEntries] = useState<TreasuryEntry[]>([]);
   const [funds, setFunds] = useState<TreasuryFund[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
 
   const supabase = useMemo(() => createClient(), []);
 
   const load = async () => {
-    const [e, f, m] = await Promise.all([
+    const [e, f, m, pr] = await Promise.all([
       supabase.from("treasury_entries").select("*").eq("ry", ry).order("entry_date", { ascending: true, nullsFirst: false }),
       supabase.from("treasury_funds").select("*").order("principal", { ascending: false }),
       supabase.from("members").select("*").eq("active", true).order("name"),
+      supabase.from("projects").select("*").eq("active", true).order("title"),
     ]);
     if (e.error) toast.error(`Ledger: ${e.error.message}`);
     if (f.error) toast.error(`Funds: ${f.error.message}`);
     setEntries(e.data ?? []);
     setFunds(f.data ?? []);
     setMembers(m.data ?? []);
+    setProjects(pr.data ?? []);
     setLoading(false);
   };
 
@@ -119,18 +122,18 @@ export default function SecretaryReportPage() {
           <TabsList className="mb-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="ledger">Ledger</TabsTrigger>
-            <TabsTrigger value="receivables">Receivables</TabsTrigger>
+            <TabsTrigger value="people">People</TabsTrigger>
             <TabsTrigger value="funds">Endowments</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview">
-            <TreasuryOverview entries={entries} funds={funds} />
+            <TreasuryOverview entries={entries} funds={funds} projects={projects} />
           </TabsContent>
           <TabsContent value="ledger">
-            <TreasuryLedger entries={entries} members={members} ry={ry} onChanged={load} />
+            <TreasuryLedger entries={entries} members={members} projects={projects} ry={ry} onChanged={load} />
           </TabsContent>
-          <TabsContent value="receivables">
-            <TreasuryReceivables entries={entries} />
+          <TabsContent value="people">
+            <TreasuryPeople entries={entries} projects={projects} />
           </TabsContent>
           <TabsContent value="funds">
             <TreasuryFunds funds={funds} onChanged={load} />

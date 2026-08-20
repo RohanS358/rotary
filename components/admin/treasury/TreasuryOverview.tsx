@@ -10,9 +10,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
 import {
-  byCategory, byMethod, formatMoney, fundTotals, inCurrency, monthlyCashFlow, totalsBy,
+  byCategory, byMethod, byProject, formatMoney, fundTotals, inCurrency, monthlyCashFlow, totalsBy,
 } from "@/lib/treasury";
-import type { TreasuryEntry, TreasuryFund } from "@/lib/types";
+import type { Project, TreasuryEntry, TreasuryFund } from "@/lib/types";
 
 const SLICE = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)", "#7c3aed", "#0d9488", "#db2777"];
 
@@ -48,10 +48,11 @@ function Stat({
 }
 
 export default function TreasuryOverview({
-  entries, funds,
+  entries, funds, projects,
 }: {
   entries: TreasuryEntry[];
   funds: TreasuryFund[];
+  projects: Project[];
 }) {
   const npr = useMemo(() => inCurrency(entries, "NPR"), [entries]);
   const usd = useMemo(() => inCurrency(entries, "USD"), [entries]);
@@ -66,6 +67,12 @@ export default function TreasuryOverview({
   const expenseCats = useMemo(() => byCategory(npr, "expense"), [npr]);
   const flow = useMemo(() => monthlyCashFlow(npr), [npr]);
   const methods = useMemo(() => byMethod(npr), [npr]);
+  const projectFunding = useMemo(() => {
+    const byId = new Map(projects.map((p) => [p.id, p]));
+    return byProject(npr)
+      .map((t) => ({ ...t, project: byId.get(t.projectId) }))
+      .filter((t) => t.project);
+  }, [npr, projects]);
 
   const collectionRate = income.committed > 0 ? (income.paid / income.committed) * 100 : 0;
 
@@ -219,6 +226,37 @@ export default function TreasuryOverview({
           )}
         </CardContent>
       </Card>
+
+      {/* Project funding */}
+      {projectFunding.length > 0 && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Project funding</CardTitle>
+            <CardDescription>What each service project raised from members, against what it has cost so far.</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-3 md:grid-cols-2">
+            {projectFunding.map((t) => {
+              const covered = t.spent > 0 ? Math.min(100, (t.raised / t.spent) * 100) : 100;
+              return (
+                <div key={t.projectId} className="rounded-xl border border-border p-4">
+                  <p className="text-sm font-medium leading-snug line-clamp-2">{t.project!.title}</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    {t.contributors} contributor{t.contributors === 1 ? "" : "s"} · {t.project!.category}
+                  </p>
+                  <Progress value={covered} className="h-1.5 my-3" />
+                  <div className="flex gap-5 text-xs tabular-nums">
+                    <span className="text-emerald-600 font-medium">{formatMoney(t.raised)} raised</span>
+                    <span className="text-destructive">{formatMoney(t.spent)} spent</span>
+                    {t.pledged > t.raised && (
+                      <span className="text-amber-600">{formatMoney(t.pledged - t.raised)} pledged, unpaid</span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Payment methods */}
       <Card>

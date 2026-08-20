@@ -138,20 +138,114 @@ export interface PayerTotals extends Totals {
   memberId: string | null;
 }
 
-/** Who owes what, across every commitment ledger. Sorted by largest outstanding. */
-export function receivablesByPayer(entries: TreasuryEntry[]): PayerTotals[] {
-  const map = new Map<string, PayerTotals>();
+/**
+ * The same person is written differently across the secretary's sheets — "Surya Bahadur
+ * Adhikari" in the dues list, "Rtn Surya Bahadur Adhikari" in the project pledges. Group
+ * on a stripped, case-folded key so one person is one record.
+ */
+export const normalizePayer = (name: string) =>
+  name
+    .toLowerCase()
+    .replace(/[.,]/g, " ")
+    .replace(/\b(rtn|rtn's|dr|mr|mrs|ms|er|prof|pp|ipp|aks|phf)\b/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+/** Everyone who has money moving through the ledger, keyed by normalized name. */
+function groupByPayer(entries: TreasuryEntry[], kind?: TreasuryKind) {
+  const map = new Map<string, { row: PayerTotals; entries: TreasuryEntry[] }>();
   for (const e of entries) {
-    if (e.kind !== "income") continue;
+    if (kind && e.kind !== kind) continue;
     const name = (e.payer ?? "").trim();
     if (!name) continue;
-    const key = name.toLowerCase();
-    const row = map.get(key) ?? { ...empty(), payer: name, memberId: e.member_id };
-    map.set(key, Object.assign(row, accumulate(row, e)));
+    const key = normalizePayer(name);
+    if (!key) continue;
+    const bucket =
+      map.get(key) ?? { row: { ...empty(), payer: name, memberId: e.member_id }, entries: [] };
+    accumulate(bucket.row, e);
+    // Keep the fullest spelling seen for display.
+    if (name.length > bucket.row.payer.length) bucket.row.payer = name;
+    // A linked member id anywhere in the group wins over a bare name.
+    bucket.row.memberId ??= e.member_id;
+    bucket.entries.push(e);
+    map.set(key, bucket);
   }
-  return [...map.values()]
+  return map;
+}
+
+/** Who owes what, across every commitment ledger. Sorted by largest outstanding. */
+export function receivablesByPayer(entries: TreasuryEntry[]): PayerTotals[] {
+  return [...groupByPayer(entries, "income").values()]
+    .map((b) => b.row)
     .filter((p) => p.outstanding > 0)
     .sort((a, b) => b.outstanding - a.outstanding);
+}
+
+export interface PersonRecord extends PayerTotals {
+  entries: TreasuryEntry[];
+  categories: CategoryTotals[];
+  /** Project ids this person put money behind (pledged or paid). */
+  projectIds: string[];
+  duesCommitted: number;
+  duesPaid: number;
+  /** TRF giving stays in its own currency — never folded into the NPR totals. */
+  trfUsd: number;
+  lastPaymentDate: string | null;
+}
+
+/**
+ * One row per person or organisation: what they committed, what they actually gave,
+ * what is still open, and which projects it went to. Income only — a member's own
+ * reimbursements are expenses of the club, not contributions by them.
+ */
+export function personRecords(entries: TreasuryEntry[]): PersonRecord[] {
+  return [...groupByPayer(entries, "income").values()]
+    .map(({ row, entries: own }) => {
+      const npr = own.filter((e) => e.currency === "NPR");
+      const dues = npr.filter((e) => e.category === "membership_dues");
+      const dates = own.map((e) => (e.paid > 0 ? e.entry_date : null)).filter(Boolean) as string[];
+      return {
+        ...row,
+        entries: own.sort((a, b) => (b.entry_date ?? "").localeCompare(a.entry_date ?? "")),
+        categories: byCategory(npr, "income"),
+        projectIds: [...new Set(own.map((e) => e.project_id).filter(Boolean) as string[])],
+        duesCommitted: dues.reduce((s, e) => s + e.committed, 0),
+        duesPaid: dues.reduce((s, e) => s + e.paid, 0),
+        trfUsd: own.filter((e) => e.currency === "USD" && e.category === "trf").reduce((s, e) => s + e.paid, 0),
+        lastPaymentDate: dates.sort().at(-1) ?? null,
+      };
+    })
+    .sort((a, b) => b.paid - a.paid);
+}
+
+/** Money raised and money spent per project, for the project-level view. */
+export interface ProjectTotals {
+  projectId: string;
+  raised: number;
+  pledged: number;
+  spent: number;
+  contributors: number;
+}
+
+export function byProject(entries: TreasuryEntry[]): ProjectTotals[] {
+  const map = new Map<string, ProjectTotals & { payers: Set<string> }>();
+  for (const e of entries) {
+    if (!e.project_id) continue;
+    const t =
+      map.get(e.project_id) ??
+      { projectId: e.project_id, raised: 0, pledged: 0, spent: 0, contributors: 0, payers: new Set<string>() };
+    if (e.kind === "income") {
+      t.raised += e.paid;
+      t.pledged += e.committed;
+      if (e.payer) t.payers.add(e.payer.toLowerCase());
+    } else {
+      t.spent += e.paid;
+    }
+    map.set(e.project_id, t);
+  }
+  return [...map.values()]
+    .map(({ payers, ...t }) => ({ ...t, contributors: payers.size }))
+    .sort((a, b) => b.raised - a.raised);
 }
 
 export const fundAnnualInterest = (f: Pick<TreasuryFund, "principal" | "interest_rate">) =>

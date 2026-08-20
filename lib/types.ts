@@ -153,6 +153,7 @@ export interface TreasuryEntry {
   category: TreasuryCategory
   label: string
   member_id: string | null
+  project_id: string | null
   payer: string | null
   currency: 'NPR' | 'USD'
   committed: number

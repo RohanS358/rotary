@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 // Node strips the type-only import, so the module loads straight from source.
-const { totalsBy, byCategory, monthlyCashFlow, receivablesByPayer, outstandingOf, fundTotals } =
+const { totalsBy, byCategory, monthlyCashFlow, receivablesByPayer, personRecords, byProject, normalizePayer, outstandingOf, fundTotals } =
   await import(new URL("../lib/treasury.ts", import.meta.url).href);
 
 // Parse the seed SQL so the check is anchored to the real workbook numbers.
@@ -22,6 +22,7 @@ const rows = [...sql.matchAll(
   payment_method: m[8] === "null" ? null : m[8].slice(1, -1),
   entry_date: m[9] === "null" ? null : m[9].slice(1, 11),
   member_id: null,
+  project_id: null,
 }));
 
 assert.equal(rows.length, 173, "seed row count");
@@ -61,6 +62,41 @@ const owed = receivablesByPayer(npr);
 assert.ok(owed.every((p, i) => i === 0 || owed[i - 1].outstanding >= p.outstanding), "sorted by outstanding");
 assert.ok(owed.every((p) => p.outstanding > 0), "settled payers dropped");
 assert.equal(owed.find((p) => p.payer === "Raj Kumar Acharya"), undefined, "fully-paid dues are not a receivable");
+
+// Per-person records: the sum of every person must equal the ledger's income side.
+const people = personRecords(npr);
+assert.equal(
+  Math.round(people.reduce((s, p) => s + p.paid, 0)),
+  Math.round(npr.filter((r) => r.payer && r.kind === "income").reduce((s, r) => s + r.paid, 0)),
+  "no contribution is lost or double-counted when grouping by person"
+);
+assert.ok(people.every((p, i) => i === 0 || people[i - 1].paid >= p.paid), "sorted by amount given");
+// "Surya Bahadur Adhikari" (dues sheet) and "Rtn Surya Bahadur Adhikari" (project pledges)
+// are one person, so his dues and his project pledge land in a single record.
+const surya = people.find((p) => normalizePayer(p.payer) === "surya bahadur adhikari");
+assert.ok(surya, "honorific-prefixed names merge with their plain spelling");
+assert.equal(surya.duesCommitted, 25000, "dues obligation");
+assert.equal(surya.duesPaid, 25000, "dues settled");
+assert.ok(surya.categories.some((c) => c.category === "installation"), "categories broken out per person");
+assert.equal(surya.entries.filter((e) => e.category === "service_project").length, 1, "service pledge attributed");
+assert.ok(people.every((p) => p.entries.every((e) => e.kind === "income")), "club expenses never count as a member's giving");
+
+// Names differing only by case are one person, not two.
+const dupes = new Set(people.map((p) => normalizePayer(p.payer)));
+assert.equal(dupes.size, people.length, "payers deduplicated case-insensitively");
+
+// Project rollup — seeded rows carry no project_id until the linking migration runs.
+assert.deepEqual(byProject(npr), [], "unlinked entries produce no project totals");
+const linked = byProject([
+  { kind: "income", paid: 100, committed: 150, payer: "A", project_id: "p1" },
+  { kind: "income", paid: 50, committed: 50, payer: "B", project_id: "p1" },
+  { kind: "income", paid: 25, committed: 25, payer: "a", project_id: "p1" },
+  { kind: "expense", paid: 200, committed: 200, payer: null, project_id: "p1" },
+]);
+assert.equal(linked[0].raised, 175);
+assert.equal(linked[0].spent, 200, "costs tracked apart from what was raised");
+assert.equal(linked[0].pledged, 225);
+assert.equal(linked[0].contributors, 2, "same payer in different case counted once");
 
 // Funds.
 const f = fundTotals([

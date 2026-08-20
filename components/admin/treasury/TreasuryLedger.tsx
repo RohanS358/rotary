@@ -14,14 +14,15 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { CATEGORY_META, categoryLabel, formatMoney, outstandingOf, PAYMENT_METHOD_LABELS } from "@/lib/treasury";
-import type { Member, TreasuryCategory, TreasuryEntry } from "@/lib/types";
+import type { Member, Project, TreasuryCategory, TreasuryEntry } from "@/lib/types";
 import EntryDialog from "./EntryDialog";
 
 export default function TreasuryLedger({
-  entries, members, ry, onChanged,
+  entries, members, projects, ry, onChanged,
 }: {
   entries: TreasuryEntry[];
   members: Member[];
+  projects: Project[];
   ry: string;
   onChanged: () => void;
 }) {
@@ -191,7 +192,7 @@ export default function TreasuryLedger({
         )}
       </div>
 
-      <EntryDialog key={editing?.id ?? "new"} open={open} onOpenChange={setOpen} editing={editing} members={members} ry={ry} onSaved={onChanged} />
+      <EntryDialog key={editing?.id ?? "new"} open={open} onOpenChange={setOpen} editing={editing} members={members} projects={projects} ry={ry} onSaved={onChanged} />
     </div>
   );
 }

@@ -11,13 +11,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { categoriesFor, categoryLabel, PAYMENT_METHOD_LABELS, outstandingOf, formatMoney } from "@/lib/treasury";
-import type { Member, PaymentMethod, TreasuryCategory, TreasuryEntry, TreasuryKind } from "@/lib/types";
+import type { Member, PaymentMethod, Project, TreasuryCategory, TreasuryEntry, TreasuryKind } from "@/lib/types";
 
 const BLANK = {
   kind: "income" as TreasuryKind,
   category: "membership_dues" as TreasuryCategory,
   label: "",
   member_id: "",
+  project_id: "",
   payer: "",
   currency: "NPR" as "NPR" | "USD",
   committed: "",
@@ -33,6 +34,7 @@ export default function EntryDialog({
   onOpenChange,
   editing,
   members,
+  projects,
   ry,
   onSaved,
 }: {
@@ -40,6 +42,7 @@ export default function EntryDialog({
   onOpenChange: (v: boolean) => void;
   editing: TreasuryEntry | null;
   members: Member[];
+  projects: Project[];
   ry: string;
   onSaved: () => void;
 }) {
@@ -51,6 +54,7 @@ export default function EntryDialog({
           category: editing.category,
           label: editing.label,
           member_id: editing.member_id ?? "",
+          project_id: editing.project_id ?? "",
           payer: editing.payer ?? "",
           currency: editing.currency,
           committed: String(editing.committed),
@@ -82,6 +86,7 @@ export default function EntryDialog({
       category: form.category,
       label: form.label.trim(),
       member_id: form.member_id || null,
+      project_id: form.project_id || null,
       payer: form.payer.trim() || null,
       currency: form.currency,
       committed,
@@ -224,6 +229,22 @@ export default function EntryDialog({
               <Label>Date</Label>
               <Input className="mt-1.5" type="date" value={form.entry_date} onChange={(e) => set("entry_date", e.target.value)} />
             </div>
+          </div>
+
+          <div>
+            <Label>Linked project</Label>
+            <Select value={form.project_id || "none"} onValueChange={(v) => set("project_id", v === "none" ? "" : v)}>
+              <SelectTrigger className="mt-1.5"><SelectValue placeholder="Not tied to a project" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Not tied to a project</SelectItem>
+                {projects.map((p) => (
+                  <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-[11px] text-muted-foreground mt-1">
+              Links this pledge or cost to a service project, so each member&rsquo;s giving can be traced to what it funded.
+            </p>
           </div>
 
           <div>
