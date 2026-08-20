@@ -14,6 +14,7 @@ import {
   Newspaper,
   BookOpen,
   CalendarDays,
+  FileSpreadsheet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -21,6 +22,7 @@ import { toast } from "sonner";
 
 const ADMIN_NAV = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  { label: "Secretary Report", href: "/admin/secretary-report", icon: FileSpreadsheet },
   { label: "Members", href: "/admin/members", icon: Users },
   { label: "Projects", href: "/admin/projects", icon: FolderOpen },
   { label: "Gallery", href: "/admin/gallery", icon: Image },

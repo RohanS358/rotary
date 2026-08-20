@@ -134,3 +134,48 @@ export interface EventRsvp {
   status: 'going' | 'interested'
   created_at: string
 }
+
+export type TreasuryKind = 'income' | 'expense'
+
+export type TreasuryCategory =
+  | 'membership_dues' | 'souvenir' | 'service_project' | 'trf'
+  | 'smile_a_while' | 'installation' | 'interest' | 'contribution'
+  | 'ri_dues' | 'district_dues' | 'rotaract' | 'administrative'
+  | 'project_cost' | 'event_cost' | 'misc'
+
+export type PaymentMethod =
+  | 'cash' | 'cheque' | 'qr' | 'fp_prime' | 'deposit' | 'bank' | 'vendor' | 'other'
+
+export interface TreasuryEntry {
+  id: string
+  ry: string
+  kind: TreasuryKind
+  category: TreasuryCategory
+  label: string
+  member_id: string | null
+  payer: string | null
+  currency: 'NPR' | 'USD'
+  committed: number
+  paid: number
+  payment_method: PaymentMethod | null
+  reference: string | null
+  entry_date: string | null
+  notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface TreasuryFund {
+  id: string
+  name: string
+  principal: number
+  institution: string | null
+  interest_rate: number
+  term_years: number | null
+  started_on: string | null
+  status: 'active' | 'due' | 'matured' | 'closed'
+  utilization: string | null
+  notes: string | null
+  created_at: string
+  updated_at: string
+}
