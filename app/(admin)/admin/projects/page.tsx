@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "@/components/ui/SmartImage";
-import { Plus, Edit, Trash2, FolderOpen, Loader2, Upload, Link2 } from "lucide-react";
+import { Plus, Edit, Trash2, FolderOpen, Loader2, Upload, Link2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -72,6 +72,7 @@ export default function AdminProjectsPage() {
   const [editing, setEditing] = useState<Project | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const fileRef = useRef<HTMLInputElement>(null);
   const supabase = createClient();
@@ -83,6 +84,26 @@ export default function AdminProjectsPage() {
   };
 
   useEffect(() => { fetchProjects(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Scrapes the district site for projects + member photos. Takes a minute or so.
+  const handleSync = async () => {
+    setSyncing(true);
+    const toastId = toast.loading("Fetching from the Rotary district site\u2026");
+    try {
+      const res = await fetch("/api/admin/sync", { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Sync failed");
+      toast.success(
+        `${data.projects} projects synced \u00b7 ${data.photosUpdated} member photos \u00b7 ${data.membersAdded} new members`,
+        { id: toastId }
+      );
+      fetchProjects();
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Sync failed", { id: toastId });
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   const openCreate = () => { setEditing(null); setForm(EMPTY_FORM); setIsOpen(true); };
   const openEdit = (p: Project) => {
@@ -158,6 +179,11 @@ export default function AdminProjectsPage() {
           <h1 className="text-2xl font-bold">Projects</h1>
           <p className="text-muted-foreground text-sm">{projects.length} projects</p>
         </div>
+        <div className="flex items-center gap-2">
+        <Button variant="outline" onClick={handleSync} disabled={syncing} className="gap-2">
+          {syncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+          {syncing ? "Syncing\u2026" : "Sync from Rotary site"}
+        </Button>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
             <Button onClick={openCreate} className="gap-2"><Plus className="w-4 h-4" /> Add Project</Button>
@@ -244,6 +270,7 @@ export default function AdminProjectsPage() {
             </div>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       <div className="space-y-3">
