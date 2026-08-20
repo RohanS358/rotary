@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "@/components/ui/SmartImage";
 import { motion, type Variants } from "framer-motion";
 import { Calendar, User, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -96,11 +97,12 @@ export default function NewsContent({ news }: Props) {
                   {/* Cover image */}
                   <div className="aspect-[16/9] bg-[#eef4fc] overflow-hidden relative">
                     {post.cover_image_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
+                      <Image
                         src={post.cover_image_url}
                         alt={post.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">

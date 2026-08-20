@@ -8,7 +8,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowRight, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import Image from "next/image";
-import image from "next/image";
 import { Backdrop } from "@react-three/drei";
 import ParticleBackground from "@/components/ui/particle-background";
 
@@ -107,7 +106,7 @@ export default function Hero({ latestProject }: HeroProps) {
           className="mb-3"
           style={{ filter: "drop-shadow(0 0 48px rgba(247,168,0,0.25))" }}
         >
-          <Image src="/wheel.png" width={140} height={140} alt="Rotary wheel" className="w-[110px] h-[110px] lg:w-[160px] lg:h-[160px] xl:w-[190px] xl:h-[190px]" />
+          <Image src="/wheel.png" width={190} height={190} priority alt="Rotary wheel" className="w-[110px] h-[110px] lg:w-[160px] lg:h-[160px] xl:w-[190px] xl:h-[190px]" />
         </motion.div>
 
         {/* Label */}

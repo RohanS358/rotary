@@ -95,6 +95,7 @@ export default function Navbar() {
                 src="/wheel.png"
                 width={44}
                 height={44}
+                priority
                 alt="Rotary wheel"
                 className="opacity-85 group-hover:opacity-100 transition-opacity"
               />

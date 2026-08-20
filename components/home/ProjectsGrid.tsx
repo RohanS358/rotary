@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+import Image from "@/components/ui/SmartImage";
 import Link from "next/link";
 import { motion, type Variants } from "framer-motion";
 import { ArrowRight, Calendar, Tag, ExternalLink } from "lucide-react";
@@ -60,6 +60,7 @@ function ProjectCard({ project }: { project: Partial<Project> }) {
             src={project.image_url}
             alt={project.title || "Project"}
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
             className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (

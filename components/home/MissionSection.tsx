@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -52,11 +53,14 @@ export default function MissionSection() {
           exit={{ opacity: 0 }}
           transition={{ duration: 2.8, ease: "easeInOut" }}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src={SLIDES[current].image}
             alt=""
-            className="w-full h-full object-cover scale-110"
+            fill
+            aria-hidden
+            sizes="100vw"
+            quality={30}
+            className="object-cover scale-110"
             style={{ filter: "blur(10px) saturate(0.6)", opacity: 0.5 }}
           />
         </motion.div>
@@ -145,11 +149,12 @@ export default function MissionSection() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 2.8, ease: "easeInOut" }}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <Image
                     src={SLIDES[current].image}
                     alt={SLIDES[current].event}
-                    className="w-full h-full object-cover"
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 640px"
+                    className="object-cover"
                   />
                   {/* Bottom-weighted gradient for text readability */}
                   <div

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
+import Image from "@/components/ui/SmartImage";
 import { Plus, Trash2, Loader2, Image as ImageIcon, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -140,7 +140,7 @@ export default function AdminGalleryPage() {
                 <div className="mt-1.5 border-2 border-dashed border-border rounded-xl p-4 text-center">
                   {form.image_url ? (
                     <div className="relative w-full h-32 rounded-lg overflow-hidden">
-                      <Image src={form.image_url} alt="Preview" fill className="object-cover" />
+                      <Image src={form.image_url} alt="Preview" fill sizes="400px" className="object-cover" />
                     </div>
                   ) : (
                     <label className="cursor-pointer flex flex-col items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
@@ -164,7 +164,7 @@ export default function AdminGalleryPage() {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
         {items.map((item) => (
           <div key={item.id} className="group relative rounded-xl overflow-hidden border border-border bg-[#f8faff] aspect-square">
-            <Image src={item.image_url} alt={item.alt_text || item.title} fill className="object-cover" />
+            <Image src={item.image_url} alt={item.alt_text || item.title} fill sizes="(max-width: 768px) 50vw, 300px" className="object-cover" />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors flex flex-col items-center justify-end p-2 gap-1">
               <p className="text-white text-xs font-medium opacity-0 group-hover:opacity-100 text-center line-clamp-2 transition-opacity">
                 {item.title}

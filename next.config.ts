@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
     root: path.resolve(__dirname),
   },
   images: {
+    qualities: [30, 75],
+    minimumCacheTTL: 2592000, // 30d — stored filenames are content-hashed
     remotePatterns: [
       {
         protocol: "https",
@@ -17,6 +19,18 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "picsum.photos",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "**.rotarydistrict3292.org.np",
+      },
+      {
+        protocol: "https",
+        hostname: "rotarydistrict3292.org.np",
       },
     ],
   },

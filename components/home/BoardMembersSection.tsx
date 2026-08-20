@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from "@/components/ui/SmartImage";
 import Link from "next/link";
 import { User, ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
@@ -76,7 +76,7 @@ export default async function BoardMembersSection() {
               style={{ background: "#eef4fc" }}
             >
               {president.photo_url ? (
-                <Image src={president.photo_url} alt={president.name || ""} fill className="object-cover" />
+                <Image src={president.photo_url} alt={president.name || ""} fill sizes="96px" className="object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
                   <User className="w-10 h-10 text-[#17458f]/30" />
@@ -111,7 +111,7 @@ export default async function BoardMembersSection() {
                 style={{ background: "#eef4fc" }}
               >
                 {member.photo_url ? (
-                  <Image src={member.photo_url} alt={member.name || ""} fill className="object-cover" />
+                  <Image src={member.photo_url} alt={member.name || ""} fill sizes="64px" className="object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
                     <User className="w-7 h-7 text-[#17458f]/25" />

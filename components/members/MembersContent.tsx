@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import Image from "@/components/ui/SmartImage";
 import { motion } from "framer-motion";
 import { User, Users, Zap } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -19,7 +19,7 @@ function MemberCard({ member }: { member: Member }) {
     >
       <div className="relative w-20 h-20 rounded-full mx-auto mb-4 bg-[#eef2fa] flex items-center justify-center overflow-hidden ring-2 ring-primary/10">
         {member.photo_url ? (
-          <Image src={member.photo_url} alt={member.name} fill className="object-cover" />
+          <Image src={member.photo_url} alt={member.name} fill sizes="80px" className="object-cover" />
         ) : (
           <User className="w-9 h-9 text-primary/40" />
         )}

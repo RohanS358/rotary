@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Image from "next/image";
+import Image from "@/components/ui/SmartImage";
 import { Plus, Edit, Trash2, Newspaper, Loader2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -196,7 +196,7 @@ export default function AdminNewsPage() {
                   </Button>
                   {form.cover_image_url && (
                     <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-border flex-shrink-0">
-                      <Image src={form.cover_image_url} alt="Preview" fill className="object-cover" />
+                      <Image src={form.cover_image_url} alt="Preview" fill sizes="400px" className="object-cover" />
                     </div>
                   )}
                 </div>

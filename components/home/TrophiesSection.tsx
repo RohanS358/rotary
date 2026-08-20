@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -85,11 +86,13 @@ const TrophyImage = ({ active, direction }: { active: number; direction: number 
         exit="exit"
         className="relative z-10"
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={TROPHIES[active].image}
           alt={TROPHIES[active].title}
-          className="w-full object-contain mx-auto"
+          width={1587}
+          height={2245}
+          sizes="(max-width: 1024px) 60vw, 208px"
+          className="w-full h-auto object-contain mx-auto"
           onError={(e) => { (e.target as HTMLImageElement).style.visibility = "hidden"; }}
           style={{
             filter: "drop-shadow(0 8px 32px rgba(247,168,0,0.32)) drop-shadow(0 2px 10px rgba(0,0,0,0.55))",
@@ -210,11 +213,13 @@ export default function TrophiesSection() {
             whileHover={{ opacity: 0.65, scale: 1.06 }}
             transition={{ type: "spring", stiffness: 350, damping: 28 }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src={TROPHIES[prev].image}
               alt={TROPHIES[prev].title}
-              className="w-full object-contain drop-shadow-xl"
+              width={1587}
+              height={2245}
+              sizes="112px"
+              className="w-full h-auto object-contain drop-shadow-xl"
               onError={(e) => { (e.target as HTMLImageElement).style.visibility = "hidden"; }}
             />
           </motion.button>
@@ -238,11 +243,13 @@ export default function TrophiesSection() {
             whileHover={{ opacity: 0.65, scale: 1.06 }}
             transition={{ type: "spring", stiffness: 350, damping: 28 }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src={TROPHIES[next].image}
               alt={TROPHIES[next].title}
-              className="w-full object-contain drop-shadow-xl"
+              width={1587}
+              height={2245}
+              sizes="112px"
+              className="w-full h-auto object-contain drop-shadow-xl"
               onError={(e) => { (e.target as HTMLImageElement).style.visibility = "hidden"; }}
             />
           </motion.button>

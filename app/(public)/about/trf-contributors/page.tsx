@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import Image from "@/components/ui/SmartImage";
 import { Award, Heart, Globe, User, ExternalLink } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import type { Member } from "@/lib/types";
@@ -214,7 +214,7 @@ function MemberGroup({
               style={{ outline: `3px solid ${accentColor}30` }}
             >
               {member.photo_url ? (
-                <Image src={member.photo_url} alt={member.name} fill className="object-cover rounded-full" />
+                <Image src={member.photo_url} alt={member.name} fill sizes="72px" className="object-cover rounded-full" />
               ) : (
                 <User className="w-8 h-8 text-primary/40" />
               )}

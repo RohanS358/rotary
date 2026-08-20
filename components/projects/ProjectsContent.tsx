@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+import Image from "@/components/ui/SmartImage";
 import { motion } from "framer-motion";
 import { Calendar, Tag, Filter, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -51,7 +51,7 @@ function ProjectCardItem({ project }: { project: Partial<Project> }) {
       {/* Image */}
       <div className="relative h-48 flex-shrink-0" style={{ background: `linear-gradient(135deg, ${color}22, ${color}0d)` }}>
         {project.image_url ? (
-          <Image src={project.image_url} alt={project.title || ""} fill className="object-cover" />
+          <Image src={project.image_url} alt={project.title || ""} fill sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw" className="object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold text-white" style={{ backgroundColor: color }}>

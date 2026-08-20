@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Image from "next/image";
+import Image from "@/components/ui/SmartImage";
 import { Plus, Edit, Trash2, FolderOpen, Loader2, Upload, Link2 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -213,7 +213,7 @@ export default function AdminProjectsPage() {
                   </Button>
                   {form.image_url && (
                     <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-border flex-shrink-0">
-                      <Image src={form.image_url} alt="Preview" fill className="object-cover" />
+                      <Image src={form.image_url} alt="Preview" fill sizes="400px" className="object-cover" />
                     </div>
                   )}
                 </div>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "@/components/ui/SmartImage";
 import { ArrowLeft, Calendar, User, Tag } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import type { NewsPost } from "@/lib/types";
@@ -55,12 +56,14 @@ export default async function NewsPostPage({
     <div className="min-h-screen bg-[#f0f5fc]">
       {/* Cover image */}
       {post.cover_image_url && (
-        <div className="w-full h-64 lg:h-96 overflow-hidden">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+        <div className="relative w-full h-64 lg:h-96 overflow-hidden">
+          <Image
             src={post.cover_image_url}
             alt={post.title}
-            className="w-full h-full object-cover"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
           />
         </div>
       )}

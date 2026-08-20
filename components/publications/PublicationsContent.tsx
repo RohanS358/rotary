@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "@/components/ui/SmartImage";
 import { motion, type Variants } from "framer-motion";
 import { Download, BookOpen, FileText, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -104,11 +105,12 @@ export default function PublicationsContent({ publications }: Props) {
                     {/* Thumbnail / placeholder */}
                     <div className="aspect-[3/4] bg-[#eef4fc] relative overflow-hidden flex-shrink-0">
                       {pub.cover_image_url ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
+                        <Image
                           src={pub.cover_image_url}
                           alt={pub.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          fill
+                          sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                       ) : (
                         <div className="w-full h-full flex flex-col items-center justify-center gap-3">
